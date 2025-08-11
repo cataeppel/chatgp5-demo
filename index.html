@@ -14,19 +14,15 @@
     .btn { padding:.75rem 1rem; border-radius:1rem; display:inline-block; }
     .btn-primary { color:#fff; background-image: linear-gradient(90deg,#7c3aed,#d946ef); }
     .btn-ghost { border:1px solid #e5e7eb; background:#fff; }
-    /* Toast */
     .toast { visibility:hidden; min-width:250px; background:#4CAF50; color:#fff; text-align:center; border-radius:8px; padding:16px; position:fixed; z-index:999; left:50%; bottom:-100px; font-size:17px; transform:translateX(-50%); opacity:0; transition:opacity .5s ease, bottom .5s ease; cursor:pointer; box-shadow:0 10px 15px -3px rgba(0,0,0,.2); }
     .toast.show { visibility:visible; opacity:1; bottom:50px; }
-    /* WhatsApp */
     .wa-btn{position:fixed;right:16px;bottom:16px;z-index:60;}
     .wa-ico{width:56px;height:56px;border-radius:9999px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 15px -3px rgba(0,0,0,.1);}
   </style>
 </head>
 <body class="min-h-screen bg-white text-slate-900">
-  <!-- Toast -->
   <div id="successToast" class="toast" role="status" aria-live="polite" title="Click to dismiss">✅ Your message has been sent successfully! (click to dismiss)</div>
 
-  <!-- Navbar -->
   <header class="sticky top-0 z-50 border-b bg-white/70 backdrop-blur">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <div class="flex items-center gap-2">
@@ -52,7 +48,6 @@
     </div>
   </header>
 
-  <!-- Pages -->
   <main id="app" class="space-y-10"></main>
 
   <footer class="mt-16 border-t">
@@ -66,7 +61,6 @@
     </div>
   </footer>
 
-  <!-- Floating WhatsApp button -->
   <div class="wa-btn">
     <a class="wa-ico grad" href="https://wa.me/40723234792?text=Salut%20eppel%20construct%2C%20a%C8%99%20dori%20o%20ofert%C4%83%20de%20proiectare" target="_blank" rel="noopener" aria-label="WhatsApp">
       <svg viewBox="0 0 32 32" fill="white" width="26" height="26" aria-hidden="true">
@@ -76,7 +70,6 @@
   </div>
 
 <script>
-// i18n content
 const i18n = {
   en: {
     nav: {home:'Home', services:'Services', projects:'Projects', process:'Process', about:'About', faq:'FAQ', contact:'Contact'},
@@ -329,7 +322,10 @@ function contact() {
   return `
   <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
     <h2 class="text-2xl md:text-3xl font-semibold tracking-tight">${t('contactH')}</h2>
-    <form class="card p-6 space-y-4 max-w-2xl" action="https://formspree.io/f/mgvzdeny" method="POST" onsubmit="return setTimeout(()=>true,0)">
+    <form class="card p-6 space-y-4 max-w-2xl"
+          action="https://formspree.io/f/mgvzdeny"
+          method="POST"
+          onsubmit="submitSpree(event)">
       <div class="grid md:grid-cols-2 gap-4">
         <input class="border rounded-xl px-3 py-2" name="name" placeholder="${f.name}" required>
         <input class="border rounded-xl px-3 py-2" type="email" name="email" placeholder="${f.email}" required>
@@ -338,7 +334,6 @@ function contact() {
         <textarea class="border rounded-xl px-3 py-2 md:col-span-2" rows="5" name="message" placeholder="${f.msg}" required></textarea>
       </div>
       <input type="hidden" name="_subject" value="New inquiry from eppel construct site">
-      <input type="hidden" name="_redirect" value="thankyou.html">
       <button class="btn btn-primary w-full md:w-auto" type="submit">${f.send}</button>
       <p class="text-xs text-slate-600">${f.demo}</p>
     </form>
@@ -356,21 +351,30 @@ function render(route) {
   app.innerHTML = (views[page] || views.home)();
 }
 
-// Toast, nav, and language init
+// Toast + init + Formspree redirect
+function submitSpree(e){
+  e.preventDefault();
+  const form = e.target;
+  fetch(form.action, {
+    method: 'POST',
+    body: new FormData(form),
+    headers: { 'Accept': 'application/json' }
+  }).then(res => {
+    if (res.ok) {
+      window.location.href = 'thankyou.html';
+    } else {
+      alert('There was a problem submitting your form. Please try again.');
+    }
+  }).catch(() => alert('Network error. Please try again.'));
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-  // toast
   const params = new URLSearchParams(window.location.search);
   const toast = document.getElementById('successToast');
   let hideTimer = null;
-  function showToast() {
-    toast.classList.add('show');
-    clearTimeout(hideTimer);
-    hideTimer = setTimeout(() => { toast.classList.remove('show'); }, 5000);
-  }
+  function showToast(){ toast.classList.add('show'); clearTimeout(hideTimer); hideTimer = setTimeout(()=>toast.classList.remove('show'), 5000); }
   if (params.get('sent') === '1') showToast();
-  toast.addEventListener('click', function(){ toast.classList.remove('show'); clearTimeout(hideTimer); });
-
-  // rest
+  toast.addEventListener('click', ()=>{ toast.classList.remove('show'); clearTimeout(hideTimer); });
   document.getElementById('yr').textContent = new Date().getFullYear();
   renderNav(); render(location.hash);
   setLang(lang);
