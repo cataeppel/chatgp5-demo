@@ -1,28 +1,66 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>eppel construct — Structural design</title>
   <meta name="description" content="Design for reinforced concrete and steel structures. Drafting and BIM-ready deliverables. Romania.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23a855f7%22/><path d=%22M20 65L45 30l10 15 25-10-25 35-10-15-15 15z%22 fill=%22%23fff%22/></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%237c3aed%22/><path d=%22M20 65L45 30l10 15 25-10-25 35-10-15-15 15z%22 fill=%22%23fff%22/></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .grad { background-image: linear-gradient(90deg, #7c3aed, #d946ef); }
-    .chip { display:inline-flex; align-items:center; font-size:.75rem; font-weight:600; border-radius:9999px; padding:.25rem .5rem; color:#fff; }
-    .card { border-radius:1rem; border:1px solid #e5e7eb; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.04); }
-    .btn { padding:.75rem 1rem; border-radius:1rem; display:inline-block; }
-    .btn-primary { color:#fff; background-image: linear-gradient(90deg,#7c3aed,#d946ef); }
-    .btn-ghost { border:1px solid #e5e7eb; background:#fff; }
-    .toast { visibility:hidden; min-width:250px; background:#4CAF50; color:#fff; text-align:center; border-radius:8px; padding:16px; position:fixed; z-index:999; left:50%; bottom:-100px; font-size:17px; transform:translateX(-50%); opacity:0; transition:opacity .5s ease, bottom .5s ease; cursor:pointer; box-shadow:0 10px 15px -3px rgba(0,0,0,.2); }
-    .toast.show { visibility:visible; opacity:1; bottom:50px; }
+    /* THEME — tuned for purple–magenta */
+    :root {
+      --bg: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #e5e7eb;
+      --card: #ffffff;
+      --grad-start: #7c3aed; /* purple */
+      --grad-end:   #d946ef; /* magenta */
+      --elev: 0 1px 2px rgba(0,0,0,.05);
+      --toast-bg: #22c55e;
+    }
+    [data-theme="dark"] {
+      --bg: #0f172a;        /* deep bluish charcoal */
+      --text: #e5e7eb;
+      --muted: #9aa4b2;
+      --border: #243042;
+      --card: #111827;      /* softer dark surface */
+      --elev: 0 1px 2px rgba(0,0,0,.35);
+      --toast-bg: #16a34a;
+    }
+
+    body { background: var(--bg); color: var(--text); transition: background .25s, color .25s; }
+    header, footer { border-color: var(--border) !important; }
+    .card { border-radius: 1rem; border: 1px solid var(--border); background: var(--card); box-shadow: var(--elev); }
+    .btn { padding: .75rem 1rem; border-radius: 1rem; display: inline-block; }
+    .btn-primary { color:#fff; background-image: linear-gradient(90deg, var(--grad-start), var(--grad-end)); }
+    .btn-ghost { border:1px solid var(--border); background: var(--card); }
+    .grad { background-image: linear-gradient(90deg, var(--grad-start), var(--grad-end)); }
+    .bg-white { background-color: var(--card) !important; }
+    .text-slate-900 { color: var(--text) !important; }
+    .text-slate-600 { color: var(--muted) !important; }
+    .border { border-color: var(--border) !important; }
+
+    /* TOAST */
+    .toast { visibility:hidden; min-width:260px; background: var(--toast-bg); color:#fff; text-align:center; border-radius:12px; padding:14px 18px; position:fixed; z-index:999; left:50%; bottom:-100px; font-size:16px; transform:translateX(-50%); opacity:0; transition:opacity .45s ease, bottom .45s ease; cursor:pointer; box-shadow:0 12px 24px rgba(0,0,0,.25); }
+    .toast.show { visibility:visible; opacity:1; bottom:42px; }
+
+    /* WhatsApp */
     .wa-btn{position:fixed;right:16px;bottom:16px;z-index:60;}
-    .wa-ico{width:56px;height:56px;border-radius:9999px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 15px -3px rgba(0,0,0,.1);}
+    .wa-ico{width:56px;height:56px;border-radius:9999px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 15px -3px rgba(0,0,0,.22);}
+
+    /* Theme toggle (bottom-left) */
+    .theme-toggle{position:fixed;left:16px;bottom:16px;z-index:60;display:flex;gap:.5rem;align-items:center}
+    .theme-btn{width:56px;height:56px;border-radius:9999px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 15px -3px rgba(0,0,0,.18)}
+    .theme-label{font-size:.85rem;color:var(--muted)}
   </style>
 </head>
-<body class="min-h-screen bg-white text-slate-900">
+<body class="min-h-screen">
+  <!-- Toast -->
   <div id="successToast" class="toast" role="status" aria-live="polite" title="Click to dismiss">✅ Your message has been sent successfully! (click to dismiss)</div>
 
+  <!-- Navbar -->
   <header class="sticky top-0 z-50 border-b bg-white/70 backdrop-blur">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <div class="flex items-center gap-2">
@@ -48,6 +86,7 @@
     </div>
   </header>
 
+  <!-- Pages -->
   <main id="app" class="space-y-10"></main>
 
   <footer class="mt-16 border-t">
@@ -61,6 +100,7 @@
     </div>
   </footer>
 
+  <!-- WhatsApp -->
   <div class="wa-btn">
     <a class="wa-ico grad" href="https://wa.me/40723234792?text=Salut%20eppel%20construct%2C%20a%C8%99%20dori%20o%20ofert%C4%83%20de%20proiectare" target="_blank" rel="noopener" aria-label="WhatsApp">
       <svg viewBox="0 0 32 32" fill="white" width="26" height="26" aria-hidden="true">
@@ -69,7 +109,17 @@
     </a>
   </div>
 
+  <!-- Theme toggle -->
+  <div class="theme-toggle">
+    <button id="themeBtn" class="theme-btn" aria-label="Toggle theme">
+      <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+    <span class="theme-label">Theme</span>
+  </div>
+
 <script>
+// i18n
 const i18n = {
   en: {
     nav: {home:'Home', services:'Services', projects:'Projects', process:'Process', about:'About', faq:'FAQ', contact:'Contact'},
@@ -254,7 +304,7 @@ function services() {
       ${t('servicesItems').map(([h,p])=>`<div class="card p-6"><h3 class="font-semibold mb-1">${h}</h3><p class="text-slate-600">${p}</p></div>`).join('')}
     </div>
     <div>
-      <h3 class="font-semibold mb-2">${t('deliverables')}</h3>
+      <h3 class="font-semibold mb-2">${t('deliverables')}}</h3>
       <ul class="list-disc pl-6 text-slate-600 space-y-1">
         ${t('deliverableItems').map(li=>`<li>${li}</li>`).join('')}
       </ul>
@@ -267,7 +317,7 @@ function projects() {
   const imgs = [IMG.resCluj, IMG.hallBrasov, IMG.retrofitBuc];
   return `
   <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-    <h2 class="text-2xl md:text-3xl font-semibold tracking-tight">${t('selectedProjects')}</h2>
+    <h2 class="text-2xl md:text-3xl font-semibold tracking-tight">${t('selectedProjects')}}</h2>
     <div class="grid md:grid-cols-3 gap-6">
       ${data.map(([title,desc],i)=>`
         <div class="card overflow-hidden">
@@ -351,7 +401,7 @@ function render(route) {
   app.innerHTML = (views[page] || views.home)();
 }
 
-// Toast + init + Formspree redirect
+// submit + toast + theme
 function submitSpree(e){
   e.preventDefault();
   const form = e.target;
@@ -368,13 +418,34 @@ function submitSpree(e){
   }).catch(() => alert('Network error. Please try again.'));
 }
 
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('theme', t);
+  const sun = document.getElementById('sunIcon');
+  const moon = document.getElementById('moonIcon');
+  if (t === 'dark') { sun.style.display='none'; moon.style.display='block'; }
+  else { sun.style.display='block'; moon.style.display='none'; }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+  // init theme
+  const saved = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(saved || (prefersDark ? 'dark' : 'light'));
+  document.getElementById('themeBtn').addEventListener('click', ()=>{
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+  });
+
+  // toast
   const params = new URLSearchParams(window.location.search);
   const toast = document.getElementById('successToast');
   let hideTimer = null;
   function showToast(){ toast.classList.add('show'); clearTimeout(hideTimer); hideTimer = setTimeout(()=>toast.classList.remove('show'), 5000); }
   if (params.get('sent') === '1') showToast();
   toast.addEventListener('click', ()=>{ toast.classList.remove('show'); clearTimeout(hideTimer); });
+
+  // rest
   document.getElementById('yr').textContent = new Date().getFullYear();
   renderNav(); render(location.hash);
   setLang(lang);
